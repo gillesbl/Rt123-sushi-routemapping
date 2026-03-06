@@ -1,11 +1,39 @@
-Startadres;Vertrektijd;Bezorgadres;Aankomsttijd;Aflevermoment;Klant;Bestelling
-Leger des Heils, Brinckhorstlaan, Den Haag;12:00;Markt 20, 2611 GP Delft;12:10;12:15;Sushi Delft;B026
-Markt 20, Delft;12:15;Stadshart 100, 2711 EC Zoetermeer;12:31;12:36;Wasabi Zoetermeer;B033
-Stadshart 100, Zoetermeer;12:36;Breestraat 100, 2311 CS Leiden;12:53;12:58;Sushi Leiden;B028
-Breestraat 100, Leiden;12:58;Voorstraat 50, 2225 EN Katwijk;13:10;13:15;Japanese Corner;B027
-Voorstraat 50, Katwijk;13:15;Frederik Hendriklaan 80, 2582 BH Den Haag;13:37;13:42;Restaurant Sakura;B004
-Frederik Hendriklaan 80, Den Haag;13:42;Laan van Meerdervoort 250, 2563 AJ Den Haag;13:45;13:50;Konnichiwa DH;B007
-Laan van Meerdervoort 250, Den Haag;13:50;Loosduinsekade 145, 2571 AB Den Haag;13:53;13:58;Sushi Express DH;B003
-Loosduinsekade 145, Den Haag;13:58;Grote Marktstraat 45, 2511 BH Den Haag;14:01;14:06;Tanaka Sushi Bar;B001
-Grote Marktstraat 45, Den Haag;14:06;Noordeinde 12, 2514 GL Den Haag;14:07;14:12;De Japanse Keuken;B002
-Noordeinde 12, Den Haag;14:12;Prins Hendrikstraat 10, 2518 HK Den Haag;14:13;14:18;Wasabi Den Haag;B006
+Startadres;Vertrektijd;Bezorgadres;Aankomsttijd;Aflevermoment;Klant;Bestelling;Aantal
+Leger des Heils, Brinckhorstlaan, Den Haag;12:00;Oostduinplein199A, Den Haag;12:01;12:06;Pieter Hasselaar;Deluxe;1
+Oostduinplein199A, Den Haag;12:06;Johan van Hoorstraat 43, Den Haag;12:06;12:11;Max Nijhof;Deluxe;1
+Johan van Hoorstraat 43, Den Haag;12:11;Pahudstraat 111 Den Haag;12:11;12:16;Fam. Lampo;Deluxe;1
+Pahudstraat 111 Den Haag;12:16;Huis Sten Koningsplein;12:16;12:21;Sten;Deluxe;6
+Huis Sten Koningsplein;12:21;Frankenslag 384a, Den Haag;12:21;12:26;Wissal Curfs;Classic;1
+Frankenslag 384a, Den Haag;12:26;Laan van Meerdervoort 55 C14, Den Haag;12:26;12:31;Nienke Landman;deluxe;1
+Laan van Meerdervoort 55 C14, Den Haag;12:31;Van Bylandstraat 158, Den Haag;12:31;12:36;Eva Tolmeijer;1x classic,1x deluxe;2
+Van Bylandstraat 158, Den Haag;12:36;Mullerhoofd 17, Rotterda;12:36;12:41;Stijn van Driessen;Deluxe;1
+Mullerhoofd 17, Rotterda;12:41;Populierstraat 22, Den Haag;12:41;12:46;Joost van Aggelen;Deluxe;2
+Populierstraat 22, Den Haag;12:46;1e braamstraat 37, 2563HT Den Haag;12:46;12:51;Joep van Kessel;Deluxe + vega;1
+1e braamstraat 37, 2563HT Den Haag;12:51;Purmerendstraat 255, Den Haag;12:51;12:56;Sander ter Horst;Deluxe;1
+Purmerendstraat 255, Den Haag;12:56;Fultonstraat 60, Den Haag;12:56;13:01;Pauline Tans;Deluxe;1
+Fultonstraat 60, Den Haag;13:01;Houtzagersingel 49, Den Haag;13:01;13:06;Arno Pont;Deluxe;1
+Houtzagersingel 49, Den Haag;13:06;Nannie van Wehlstraat 95, Den Haag;13:06;13:11;Bas Derksen;1x vega;1
+Nannie van Wehlstraat 95, Den Haag;13:11;Amandelstraat 49, Den Haag;13:11;13:16;Nick van der Elst;Deluxe;1
+Amandelstraat 49, Den Haag;13:16;Cederstraat 56, Den Haag;13:16;13:21;Lennart Hoeksema;Deluxe;1
+Cederstraat 56, Den Haag;13:21;Van Neckstraat 47, Den Haag;13:21;13:26;Pim Smith;Deluxe;1
+Van Neckstraat 47, Den Haag;13:26;Regentesselaan 296, Den Haag;13:26;13:31;Milou vd Broek;1x vega, 1x deluxe;2
+Regentesselaan 296, Den Haag;13:31;Kepplerstraat 214, Den Haag;13:31;13:36;Alexandra Kievit;Deluxe;1
+Kepplerstraat 214, Den Haag;13:36;Heutszstraat 82, Den Haag;13:36;13:41;Anne Castermans;Deluxe;1
+Heutszstraat 82, Den Haag;13:41;Stevinstraat 93, 2587 EC Den Haag;13:41;13:46;Robert Thomson;Classic;1
+Stevinstraat 93, 2587 EC Den Haag;13:46;Cornelis de Wittlaan 94, Den Haag;13:46;13:51;Bart Bootsma;Deluxe;1
+Cornelis de Wittlaan 94, Den Haag;13:51;Havenkade 24, Den Haag;13:51;13:56;Lysanne Vossen;1x Deluxe, 1x classic;2
+Havenkade 24, Den Haag;13:56;Korendijkstraat 36, 2586 RP Den Haag;13:56;14:01;Kelly Heij;classic;1
+Korendijkstraat 36, 2586 RP Den Haag;14:01;2de Joan Maetsuyckersttraat 251, 2593ZJ Den Haag;14:01;14:06;Annegreet Veldhuis-Vlug;Deluxe;1
+2de Joan Maetsuyckersttraat 251, 2593ZJ Den Haag;14:06;Doris Lessinglaan 130, 2553ZB Den Haag;14:06;14:11;Karen Reiman;Deluxe;1
+Doris Lessinglaan 130, 2553ZB Den Haag;14:11;Valkenlaan 13, Wateringen;14:16;14:21;Fam. Van der Klei;Deluxe;1
+Valkenlaan 13, Wateringen;14:21;van Vredenburchweg 671, Rijswijk;14:26;14:31;Michelle van Pelt;Classic;1
+van Vredenburchweg 671, Rijswijk;14:31;Rhijnauwen 24,2286 NH, Rijswijk;14:31;14:36;Carlos Ferreira de Matos;Deluxe;1
+Rhijnauwen 24,2286 NH, Rijswijk;14:36;Kolk 22, Delft;14:41;14:46;Sten;Deluxe;1
+Kolk 22, Delft;14:46;Hof van Naeltwijck 27, nootdorp;14:53;14:58;Sten;Deluxe;2
+Hof van Naeltwijck 27, nootdorp;14:58;Spilsteeg 23, Leiden;15:20;15:25;Nina van der Voort;2x classic;2
+Spilsteeg 23, Leiden;15:25;Louise de Colignylaan 40, Santpoort Zuid;16:08;16:13;Fam. Dijckmeester;2x Vega;2
+Louise de Colignylaan 40, Santpoort Zuid;16:13;Anemonenweg 26, Wassenaar;17:03;17:08;Marie-Fleur Westenburg;Deluxe;1
+Anemonenweg 26, Wassenaar;17:08;Hofwijckstraat 16, Voorburg;17:21;17:26;Wouter Roobeek;Deluxe;1
+Hofwijckstraat 16, Voorburg;17:26;Park Leeuwensteijn 13, Voorburg;17:26;17:31;Floris Jansen;1x classic, 1x deluxe;2
+Park Leeuwensteijn 13, Voorburg;17:31;Carel Vosmaerstraat 14, Voorburg;17:31;17:36;Norah;1x Deluxe, 1x Vega;2
+Carel Vosmaerstraat 14, Voorburg;17:36;vd wateringelaan 183 Voorburg;17:36;17:41;Reinout Gulje;1x Deluxe, 1x Classic;2

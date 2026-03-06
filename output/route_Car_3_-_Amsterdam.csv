@@ -1,10 +1,17 @@
-Startadres;Vertrektijd;Bezorgadres;Aankomsttijd;Aflevermoment;Klant;Bestelling
-Leger des Heils, Brinckhorstlaan, Den Haag;12:00;Grote Houtstraat 50, 2011 SG Haarlem;13:01;13:06;Edo Sushi Haarlem;B030
-Grote Houtstraat 50, Haarlem;13:06;Kinkerstraat 100, 1053 ED Amsterdam;13:29;13:34;Izakaya A'dam;B021
-Kinkerstraat 100, Amsterdam;13:34;Overtoom 200, 1054 HP Amsterdam;13:35;13:40;Fuji Sushi A'dam;B025
-Overtoom 200, Amsterdam;13:40;Beethovenstraat 60, 1077 JJ Amsterdam;13:44;13:49;Tokyo Garden AMS;B024
-Beethovenstraat 60, Amsterdam;13:49;Albert Cuypstraat 150, 1073 BL Amsterdam;13:51;13:56;Moshi Moshi AMS;B022
-Albert Cuypstraat 150, Amsterdam;13:56;Reguliersdwarsstraat 40, 1017 BN Amsterdam;13:57;14:02;Sushi Amsterdam;B019
-Reguliersdwarsstraat 40, Amsterdam;14:02;Utrechtsestraat 75, 1017 VJ Amsterdam;14:02;14:07;Omakase Amsterdam;B020
-Utrechtsestraat 75, Amsterdam;14:07;Stadhuisplein 1, 1315 HR Almere;14:45;14:50;Tokyo Almere;B034
-Stadhuisplein 1, Almere;14:50;Kerkstraat 60, 1211 CW Hilversum;15:12;15:17;Maki Hilversum;B031
+Startadres;Vertrektijd;Bezorgadres;Aankomsttijd;Aflevermoment;Klant;Bestelling;Aantal
+Leger des Heils, Brinckhorstlaan, Den Haag;12:00;Van der Palmkade 11, Amsterdam;13:18;13:23;Dam. Dijckmeester;2x Deluxe;2
+Van der Palmkade 11, Amsterdam;13:23;Laurierstraat 248-1, Amsterdam;13:23;13:28;Fam. Van Listenburg;Classic;1
+Laurierstraat 248-1, Amsterdam;13:28;Peelstraat 35, Amsterdam;13:28;13:33;Friso Resink;vega;1
+Peelstraat 35, Amsterdam;13:33;Weenahof 5, Amsterdam;13:33;13:38;Daan Eleveld;Vega, classic;2
+Weenahof 5, Amsterdam;13:38;Korte Vogelstraat 11, Amsterdam;13:38;13:43;Pieter Herings;Deluxe;1
+Korte Vogelstraat 11, Amsterdam;13:43;Amstelvlietstraat 471, Amsterdam;13:43;13:48;Otis Koningswijk;1x deluxe;1
+Amstelvlietstraat 471, Amsterdam;13:48;Winkler prinshof 9-2, Amsterdam;13:48;13:53;Floor Oosterwechel;Classic;1
+Winkler prinshof 9-2, Amsterdam;13:53;Nieuwe Keizersgracht 454, Amsterdam;13:53;13:58;Julia van Buuren;Deluxe;1
+Nieuwe Keizersgracht 454, Amsterdam;13:58;Vrolikstraat 290-4, Amsterdam;13:58;14:03;Koen Enneking;Vega;1
+Vrolikstraat 290-4, Amsterdam;14:03;Tweede Hugo de Grootstraat 15-1, Amsterdam;14:03;14:08;Folkert de Jong;Deluxe;1
+Tweede Hugo de Grootstraat 15-1, Amsterdam;14:08;Kanaalstraat 102e, Amsterdam;14:08;14:13;Maud Oostenbroek;Classic;1
+Kanaalstraat 102e, Amsterdam;14:13;Sumatrastraat 94B, Amsterdam;14:13;14:18;Emmy Hertogh;Deluxe;1
+Sumatrastraat 94B, Amsterdam;14:18;Aalsmeerweg 83-1, Amsterdam;14:18;14:23;Fabienne van den Akker;Deluxe;1
+Aalsmeerweg 83-1, Amsterdam;14:23;Zomerdijkstraat 6-1, 1079XA Amsterdam;14:23;14:28;Thomas Colenbrander;1x deluxe, 1x vega;2
+Zomerdijkstraat 6-1, 1079XA Amsterdam;14:28;Tugelaweg 48D, 1092 VH Amsterdam;14:28;14:33;Teus Louwerens;2x Deluxe;2
+Tugelaweg 48D, 1092 VH Amsterdam;14:33;Vijzelgracht 27A, 1017HN Amsterdam;14:33;14:38;Alex Dekker;Deluxe;2

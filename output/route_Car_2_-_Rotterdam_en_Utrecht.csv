@@ -1,13 +1,8 @@
-Startadres;Vertrektijd;Bezorgadres;Aankomsttijd;Aflevermoment;Klant;Bestelling
-Leger des Heils, Brinckhorstlaan, Den Haag;12:00;Schiedamseweg 60, 3025 AE Rotterdam;12:29;12:34;Maki & More;B013
-Schiedamseweg 60, Rotterdam;12:34;Nieuwe Binnenweg 75, 3014 GE Rotterdam;12:36;12:41;Oishi Rotterdam;B009
-Nieuwe Binnenweg 75, Rotterdam;12:41;Witte de Withstraat 50, 3012 BR Rotterdam;12:43;12:48;Sushi Time Rotterdam;B008
-Witte de Withstraat 50, Rotterdam;12:48;Karel Doormanstraat 300, 3012 GP Rotterdam;12:48;12:53;Sushi Palace R'dam;B012
-Karel Doormanstraat 300, Rotterdam;12:53;Coolsingel 100, 3011 AG Rotterdam;12:54;12:59;Tokyo Ramen R'dam;B010
-Coolsingel 100, Rotterdam;12:59;Voorstraat 200, 3311 ES Dordrecht;13:27;13:32;Sushi Dordrecht;B032
-Voorstraat 200, Dordrecht;13:32;Langestraat 50, 3811 NJ Amersfoort;15:04;15:09;Sushi Amersfoort;B035
-Langestraat 50, Amersfoort;15:09;Biltstraat 45, 3572 AD Utrecht;15:37;15:42;Zen Sushi Utrecht;B018
-Biltstraat 45, Utrecht;15:42;Nachtegaalstraat 30, 3581 AD Utrecht;15:43;15:48;Japanese Kitchen UU;B016
-Nachtegaalstraat 30, Utrecht;15:48;Oudegracht 150, 3511 AZ Utrecht;15:49;15:54;Sushi & Co Utrecht;B014
-Oudegracht 150, Utrecht;15:54;Voorstraat 88, 3512 AT Utrecht;15:55;16:00;Sakana Utrecht;B015
-Voorstraat 88, Utrecht;16:00;Markt 35, 2801 JJ Gouda;16:44;16:49;Sushi Gouda;B029
+Startadres;Vertrektijd;Bezorgadres;Aankomsttijd;Aflevermoment;Klant;Bestelling;Aantal
+Leger des Heils, Brinckhorstlaan, Den Haag;12:00;Bruijnstraat 38, Rotterdam;12:29;12:34;Wout Frijters;Classic;1
+Bruijnstraat 38, Rotterdam;12:34;Maaskade 138a03 Rotterdam;12:34;12:39;Iris Louwerens;1x Vega, 1x Classic, 1x Deluxe, 1x Sake;4
+Maaskade 138a03 Rotterdam;12:39;oudwijkerdwarsstraat 129, Utrecht;13:51;13:56;Fam. Dijckmeester;Deluxe;1
+oudwijkerdwarsstraat 129, Utrecht;13:56;Ondiep 145-BIS, Utrecht;13:56;14:01;Bram Rijsbosch;vega;1
+Ondiep 145-BIS, Utrecht;14:01;Flamingostraat 4bis, Utrecht;14:01;14:06;Rutger van Eeuwijk;Deluxe;1
+Flamingostraat 4bis, Utrecht;14:06;Begijnehof 28, Utrecht;14:06;14:11;Maaike Tol;Classic;1
+Begijnehof 28, Utrecht;14:11;Schipholweg 77, Badhoevedorp;15:05;15:10;Fam. Ferwerda;2x Deluxe;2

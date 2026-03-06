@@ -2,12 +2,12 @@
 """
 Sushi Delivery Route Optimizer
 
-Reads an Excel file with delivery orders, filters for 'Leveren' tag,
-assigns orders to 3 delivery cars (Den Haag, Rotterdam+Utrecht, Amsterdam),
-and optimizes each car's route using TSP (Travelling Salesman Problem).
+Reads "Overzicht Bestellingen.xlsx" with delivery orders, filters for deliveries
+('Leveren'), assigns orders to 3 delivery cars (Den Haag area, Rotterdam+Utrecht,
+Amsterdam), and optimizes each car's route using TSP (Travelling Salesman Problem).
 
 Usage:
-    python optimize_routes.py --input bestellingen.xlsx --start-time 12:00 --dropoff-time 5
+    python optimize_routes.py --input "Overzicht bestellingen.xlsx" --start-time 12:00 --dropoff-time 5
 
 Args:
     --input:        Path to Excel file with delivery orders
@@ -19,6 +19,7 @@ Args:
 import argparse
 import math
 import os
+import re
 import sys
 import time
 from datetime import datetime, timedelta
@@ -36,58 +37,86 @@ DEPOT_LABEL = "Leger des Heils, Brinckhorstlaan, Den Haag"
 
 # City assignments per car
 CAR_ASSIGNMENTS = {
-    "Car 1 - Den Haag": ["Den Haag", "Delft", "Zoetermeer", "Katwijk", "Leiden"],
-    "Car 2 - Rotterdam & Utrecht": ["Rotterdam", "Utrecht", "Gouda", "Dordrecht", "Amersfoort"],
-    "Car 3 - Amsterdam": ["Amsterdam", "Haarlem", "Hilversum", "Almere"],
+    "Car 1 - Den Haag": [
+        "Den Haag", "Delft", "Zoetermeer", "Katwijk", "Leiden",
+        "Rijswijk", "Voorburg", "Wassenaar", "Wateringen", "Nootdorp",
+        "Leidschendam", "Santpoort Zuid",
+    ],
+    "Car 2 - Rotterdam & Utrecht": [
+        "Rotterdam", "Utrecht", "Gouda", "Dordrecht", "Amersfoort",
+        "Badhoevedorp", "Schiedam",
+    ],
+    "Car 3 - Amsterdam": [
+        "Amsterdam", "Haarlem", "Hilversum", "Almere",
+    ],
 }
 
 # Average driving speed in km/h (urban delivery driving)
 AVG_SPEED_KMH = 40
 
-# ── Geocoding ──────────────────────────────────────────────────────────────
+# ── Address Parsing ────────────────────────────────────────────────────────
 
-# Postcode-prefix to approximate coordinates lookup.
-# Dutch postcodes: first 4 digits give a good area approximation.
-# These are representative coordinates for postcode areas used in our data.
-POSTCODE_COORDS = {
-    # Den Haag area
-    "2511": (52.0775, 4.3125),  # Centrum
-    "2514": (52.0830, 4.3140),  # Noordeinde
-    "2571": (52.0640, 4.2900),  # Loosduinen
-    "2582": (52.0900, 4.2800),  # Statenkwartier
-    "2518": (52.0810, 4.3240),  # Willemspark
-    "2563": (52.0730, 4.2650),  # Laan van Meerdervoort west
-    "2526": (52.0550, 4.3200),  # Laak
-    # Rotterdam area
-    "3012": (51.9180, 4.4760),  # Centrum-West
-    "3014": (51.9170, 4.4580),  # Nieuwe Binnenweg
-    "3011": (51.9225, 4.4792),  # Centrum
-    "3025": (51.9100, 4.4400),  # Schiedam-grens
-    # Utrecht area
-    "3511": (52.0907, 5.1214),  # Centrum
-    "3512": (52.0930, 5.1180),  # Voorstraat
-    "3581": (52.0870, 5.1300),  # Nachtegaal
-    "3513": (52.1000, 5.1150),  # Noord
-    "3572": (52.0920, 5.1350),  # Biltstraat
-    # Amsterdam area
-    "1017": (52.3630, 4.8950),  # Centrum-Oost
-    "1053": (52.3680, 4.8650),  # Kinkerbuurt
-    "1073": (52.3550, 4.8930),  # De Pijp
-    "1072": (52.3530, 4.8900),  # De Pijp-Zuid
-    "1077": (52.3480, 4.8780),  # Zuid
-    "1054": (52.3690, 4.8700),  # Overtoom
-    # Surrounding areas
-    "2611": (52.0116, 4.3571),  # Delft
-    "2225": (52.1990, 4.4050),  # Katwijk
-    "2311": (52.1601, 4.4970),  # Leiden
-    "2801": (52.0115, 4.7106),  # Gouda
-    "2011": (52.3812, 4.6360),  # Haarlem
-    "1211": (52.2292, 5.1764),  # Hilversum
-    "3311": (51.8133, 4.6901),  # Dordrecht
-    "2711": (52.0600, 4.4950),  # Zoetermeer
-    "1315": (52.3508, 5.2647),  # Almere
-    "3811": (52.1561, 5.3878),  # Amersfoort
-}
+# Known Dutch cities/towns for extraction from freeform addresses
+KNOWN_CITIES = [
+    "Den Haag", "Amsterdam", "Rotterdam", "Utrecht", "Delft",
+    "Rijswijk", "Voorburg", "Wassenaar", "Wateringen", "Nootdorp",
+    "Leidschendam", "Leiden", "Zoetermeer", "Katwijk",
+    "Haarlem", "Hilversum", "Almere",
+    "Gouda", "Dordrecht", "Amersfoort", "Schiedam",
+    "Badhoevedorp", "Santpoort Zuid",
+]
+
+# Dutch postcode regex: 4 digits + optional space + 2 letters
+POSTCODE_RE = re.compile(r'\b(\d{4})\s*([A-Za-z]{2})\b')
+
+
+def parse_address(raw_address: str) -> dict:
+    """Parse a freeform Dutch address into components."""
+    result = {"raw": raw_address, "street": "", "postcode": "", "city": ""}
+
+    if not raw_address or raw_address.strip().lower() in ("ophalen", ""):
+        return result
+
+    addr = raw_address.strip()
+
+    # Extract postcode
+    pc_match = POSTCODE_RE.search(addr)
+    if pc_match:
+        result["postcode"] = pc_match.group(1) + pc_match.group(2).upper()
+
+    # Extract city (check longest names first to match "Den Haag" before "Haag", etc.)
+    addr_lower = addr.lower()
+    for city in sorted(KNOWN_CITIES, key=len, reverse=True):
+        if city.lower() in addr_lower:
+            result["city"] = city
+            break
+
+    # If no city found, try the last part after the last comma
+    if not result["city"]:
+        parts = addr.split(",")
+        if len(parts) >= 2:
+            last_part = parts[-1].strip()
+            # Remove postcode from the last part to get city name
+            city_candidate = POSTCODE_RE.sub("", last_part).strip()
+            if city_candidate:
+                result["city"] = city_candidate
+
+    # Street is everything before the postcode or city
+    street = addr
+    if pc_match:
+        street = addr[:pc_match.start()].rstrip(", ")
+    elif result["city"]:
+        # Remove city from end
+        idx = addr_lower.rfind(result["city"].lower())
+        if idx > 0:
+            street = addr[:idx].rstrip(", ")
+
+    result["street"] = street
+
+    return result
+
+
+# ── Geocoding ──────────────────────────────────────────────────────────────
 
 # City center fallback coordinates
 CITY_CENTERS = {
@@ -105,6 +134,15 @@ CITY_CENTERS = {
     "Zoetermeer": (52.0600, 4.4950),
     "Almere": (52.3508, 5.2647),
     "Amersfoort": (52.1561, 5.3878),
+    "Rijswijk": (52.0362, 4.3267),
+    "Voorburg": (52.0700, 4.3600),
+    "Wassenaar": (52.1452, 4.3993),
+    "Wateringen": (52.0411, 4.2817),
+    "Nootdorp": (52.0442, 4.3914),
+    "Leidschendam": (52.0864, 4.3839),
+    "Badhoevedorp": (52.3364, 4.7839),
+    "Santpoort Zuid": (52.4100, 4.6200),
+    "Schiedam": (51.9192, 4.3989),
 }
 
 _geocode_cache = {}
@@ -129,35 +167,48 @@ def geocode_address(address: str, geolocator: Nominatim) -> tuple[float, float] 
     return None
 
 
-def geocode_by_postcode(postcode: str, city: str) -> tuple[float, float]:
-    """Look up coordinates by postcode prefix, falling back to city center."""
-    prefix = postcode.strip().replace(" ", "")[:4]
-    if prefix in POSTCODE_COORDS:
-        return POSTCODE_COORDS[prefix]
-    if city in CITY_CENTERS:
-        return CITY_CENTERS[city]
+def geocode_order(parsed: dict, geolocator: Nominatim) -> tuple[float, float]:
+    """Geocode a parsed address, using Nominatim with city-center fallback."""
+    # Build a full address string for Nominatim
+    parts = []
+    if parsed["street"]:
+        parts.append(parsed["street"])
+    if parsed["postcode"]:
+        parts.append(parsed["postcode"])
+    if parsed["city"]:
+        parts.append(parsed["city"])
+    parts.append("Netherlands")
+
+    full_address = ", ".join(parts)
+    coords = geocode_address(full_address, geolocator)
+    if coords:
+        return coords
+
+    # Fallback: try with just postcode + city
+    if parsed["postcode"] and parsed["city"]:
+        fallback = f"{parsed['postcode']} {parsed['city']}, Netherlands"
+        coords = geocode_address(fallback, geolocator)
+        if coords:
+            return coords
+
+    # Fallback: city center
+    if parsed["city"] in CITY_CENTERS:
+        return CITY_CENTERS[parsed["city"]]
+
+    # Last resort: Den Haag center
     return CITY_CENTERS["Den Haag"]
 
 
 def geocode_all_orders(orders: pd.DataFrame, geolocator: Nominatim) -> pd.DataFrame:
-    """Geocode all order addresses using postcode lookup with Nominatim fallback."""
+    """Geocode all order addresses."""
     lats, lons = [], []
 
     for _, row in orders.iterrows():
-        # Primary: postcode-based lookup (fast, no API calls)
-        coords = geocode_by_postcode(row["Postcode"], row["Stad"])
-
-        # Try Nominatim for better accuracy (with rate limiting)
-        full_address = f"{row['Adres']}, {row['Postcode']} {row['Stad']}, Netherlands"
-        nominatim_coords = geocode_address(full_address, geolocator)
-        if nominatim_coords:
-            coords = nominatim_coords
-        else:
-            time.sleep(1.1)  # Respect Nominatim rate limit
-
+        coords = geocode_order(row["_parsed"], geolocator)
         lats.append(coords[0])
         lons.append(coords[1])
-        print(f"  {row['Klant']:30s} -> ({coords[0]:.4f}, {coords[1]:.4f})")
+        print(f"  {row['Klant']:40s} -> ({coords[0]:.4f}, {coords[1]:.4f})  [{row['_city']}]")
+        time.sleep(1.1)  # Respect Nominatim rate limit
 
     orders = orders.copy()
     orders["lat"] = lats
@@ -167,12 +218,11 @@ def geocode_all_orders(orders: pd.DataFrame, geolocator: Nominatim) -> pd.DataFr
 
 # ── Car Assignment ─────────────────────────────────────────────────────────
 
-def assign_car(city: str) -> str:
+def assign_car(city: str) -> str | None:
     """Assign an order to a car based on its city."""
     for car_name, cities in CAR_ASSIGNMENTS.items():
         if city in cities:
             return car_name
-    # For unknown cities, find closest car region center
     return None
 
 
@@ -180,15 +230,14 @@ def assign_orders_to_cars(orders: pd.DataFrame, depot_coords: tuple) -> dict[str
     """Assign each order to one of the 3 cars."""
     assignments = {car: [] for car in CAR_ASSIGNMENTS}
 
-    # Pre-compute approximate centers for each car region
     car_centers = {
-        "Car 1 - Den Haag": (52.0705, 4.3007),       # Den Haag
-        "Car 2 - Rotterdam & Utrecht": (51.98, 4.75),  # Between R'dam and Utrecht
-        "Car 3 - Amsterdam": (52.3676, 4.9041),        # Amsterdam
+        "Car 1 - Den Haag": (52.0705, 4.3007),
+        "Car 2 - Rotterdam & Utrecht": (51.98, 4.75),
+        "Car 3 - Amsterdam": (52.3676, 4.9041),
     }
 
     for idx, row in orders.iterrows():
-        car = assign_car(row["Stad"])
+        car = assign_car(row["_city"])
         if car is None:
             # Find nearest car region by distance
             order_coords = (row["lat"], row["lon"])
@@ -200,7 +249,7 @@ def assign_orders_to_cars(orders: pd.DataFrame, depot_coords: tuple) -> dict[str
                     min_dist = dist
                     best_car = car_name
             car = best_car
-            print(f"  Assigned {row['Stad']} ({row['Klant']}) -> {car} (nearest region)")
+            print(f"  Assigned {row['_city'] or 'unknown'} ({row['Klant']}) -> {car} (nearest region)")
         assignments[car].append(idx)
 
     result = {}
@@ -231,7 +280,6 @@ def compute_time_matrix(distance_matrix: list[list[float]], speed_kmh: float) ->
     for i in range(n):
         for j in range(n):
             if i != j:
-                # Time in seconds = (distance_km / speed_kmh) * 3600
                 time_matrix[i][j] = int((distance_matrix[i][j] / speed_kmh) * 3600)
     return time_matrix
 
@@ -239,10 +287,7 @@ def compute_time_matrix(distance_matrix: list[list[float]], speed_kmh: float) ->
 # ── TSP Route Optimization ────────────────────────────────────────────────
 
 def solve_tsp(time_matrix: list[list[int]]) -> list[int] | None:
-    """
-    Solve TSP using Google OR-Tools.
-    Node 0 is the depot. Returns ordered list of node indices.
-    """
+    """Solve TSP using Google OR-Tools. Node 0 is the depot."""
     n = len(time_matrix)
     if n <= 1:
         return [0]
@@ -260,7 +305,6 @@ def solve_tsp(time_matrix: list[list[int]]) -> list[int] | None:
     transit_callback_index = routing.RegisterTransitCallback(time_callback)
     routing.SetArcCostEvaluatorOfAllVehicles(transit_callback_index)
 
-    # Set search parameters
     search_parameters = pywrapcp.DefaultRoutingSearchParameters()
     search_parameters.first_solution_strategy = (
         routing_enums_pb2.FirstSolutionStrategy.PATH_CHEAPEST_ARC
@@ -300,29 +344,22 @@ def generate_route_csv(
     current_time = start_time
     dropoff_delta = timedelta(minutes=dropoff_minutes)
 
-    # Build coordinate list (depot=0, then orders)
-    # route_order[0] = 0 (depot), route_order[1:] = delivery stops
-
     for i in range(1, len(route_order)):
         prev_idx = route_order[i - 1]
         curr_idx = route_order[i]
 
-        # Previous location
         if prev_idx == 0:
             start_address = DEPOT_LABEL
         else:
             prev_order = car_orders.iloc[prev_idx - 1]
-            start_address = f"{prev_order['Adres']}, {prev_order['Stad']}"
+            start_address = prev_order["_address_raw"]
 
-        # Current delivery
         order = car_orders.iloc[curr_idx - 1]
-        delivery_address = f"{order['Adres']}, {order['Postcode']} {order['Stad']}"
+        delivery_address = order["_address_raw"]
 
-        # Driving time
         drive_seconds = int((distance_matrix[prev_idx][curr_idx] / AVG_SPEED_KMH) * 3600)
         drive_delta = timedelta(seconds=drive_seconds)
 
-        # Times
         depart_time = current_time
         arrive_time = depart_time + drive_delta
         dropoff_end = arrive_time + dropoff_delta
@@ -335,6 +372,7 @@ def generate_route_csv(
             "Aflevermoment": dropoff_end.strftime("%H:%M"),
             "Klant": order["Klant"],
             "Bestelling": order["Bestelling"],
+            "Aantal": order["Q"],
         })
 
         current_time = dropoff_end
@@ -344,7 +382,6 @@ def generate_route_csv(
     filepath = os.path.join(output_dir, f"route_{safe_name}.csv")
     df.to_csv(filepath, index=False, sep=";")
 
-    # Summary
     if rows:
         last_dropoff = rows[-1]["Aflevermoment"]
         total_dist = sum(
@@ -361,7 +398,8 @@ def generate_route_csv(
 
 def main():
     parser = argparse.ArgumentParser(description="Sushi Delivery Route Optimizer")
-    parser.add_argument("--input", required=True, help="Path to Excel file with orders")
+    parser.add_argument("--input", default="Overzicht bestellingen.xlsx",
+                        help="Path to Excel file with orders")
     parser.add_argument("--start-time", default="12:00",
                         help="Start driving time HH:MM (default: 12:00)")
     parser.add_argument("--dropoff-time", type=int, default=5,
@@ -370,7 +408,6 @@ def main():
                         help="Output directory for CSV files (default: ./output)")
     args = parser.parse_args()
 
-    # Parse start time
     try:
         start_dt = datetime.strptime(args.start_time, "%H:%M")
         start_dt = start_dt.replace(year=2026, month=3, day=6)
@@ -383,61 +420,88 @@ def main():
     # ── Step 1: Read and filter Excel ──────────────────────────────────
     print("Step 1: Reading Excel file...")
     df = pd.read_excel(args.input)
-    print(f"  Total orders: {len(df)}")
 
-    # Filter for 'Leveren' only
-    df_leveren = df[df["Tag"] == "Leveren"].reset_index(drop=True)
-    print(f"  Orders with 'Leveren' tag: {len(df_leveren)}")
+    # Rename columns to internal names
+    col_map = {
+        "Q": "Q",
+        "Bestelling": "Bestelling",
+        "Klant": "Klant",
+        "Ophalen/Bezorgen": "Type",
+        "Adres (indien bezorgen)": "Adres_raw",
+    }
+    df = df.rename(columns=col_map)
+    print(f"  Total rows: {len(df)}")
+
+    # Filter for deliveries only (case-insensitive "leveren")
+    df["Type_lower"] = df["Type"].astype(str).str.strip().str.lower()
+    df_leveren = df[df["Type_lower"].str.contains("leveren", na=False)].copy()
+    # Exclude pickup addresses
+    df_leveren = df_leveren[
+        ~df_leveren["Adres_raw"].astype(str).str.strip().str.lower().isin(["ophalen", ""])
+    ].reset_index(drop=True)
+    print(f"  Delivery orders: {len(df_leveren)}")
 
     if df_leveren.empty:
-        print("No 'Leveren' orders found. Exiting.")
+        print("No delivery orders found. Exiting.")
         sys.exit(0)
 
-    # ── Step 2: Geocode addresses ──────────────────────────────────────
-    print("\nStep 2: Geocoding addresses...")
+    # ── Step 2: Parse addresses ────────────────────────────────────────
+    print("\nStep 2: Parsing addresses...")
+    parsed_list = []
+    cities = []
+    for _, row in df_leveren.iterrows():
+        parsed = parse_address(str(row["Adres_raw"]))
+        parsed_list.append(parsed)
+        cities.append(parsed["city"])
+
+    df_leveren["_parsed"] = parsed_list
+    df_leveren["_city"] = cities
+    df_leveren["_address_raw"] = df_leveren["Adres_raw"].astype(str).str.strip()
+
+    # Show parsed summary
+    city_counts = df_leveren["_city"].value_counts()
+    for city, count in city_counts.items():
+        print(f"  {city or 'Unknown'}: {count} orders")
+
+    # ── Step 3: Geocode addresses ──────────────────────────────────────
+    print("\nStep 3: Geocoding addresses...")
     geolocator = Nominatim(user_agent="sushi_route_optimizer_v1")
 
-    # Geocode depot
     depot_coords = geocode_address(DEPOT_ADDRESS, geolocator)
     if depot_coords is None:
         print("  Could not geocode depot. Using known coordinates.")
-        depot_coords = (52.0698, 4.3151)  # Brinckhorstlaan, Den Haag
+        depot_coords = (52.0698, 4.3151)
     print(f"  Depot: {DEPOT_LABEL} -> {depot_coords}")
 
-    # Geocode all orders
     df_leveren = geocode_all_orders(df_leveren, geolocator)
     print(f"  Geocoded {len(df_leveren)} addresses")
 
-    # ── Step 3: Assign orders to cars ──────────────────────────────────
-    print("\nStep 3: Assigning orders to cars...")
+    # ── Step 4: Assign orders to cars ──────────────────────────────────
+    print("\nStep 4: Assigning orders to cars...")
     car_groups = assign_orders_to_cars(df_leveren, depot_coords)
 
     for car, orders in car_groups.items():
         print(f"  {car}: {len(orders)} deliveries")
 
-    # ── Step 4: Optimize routes per car ────────────────────────────────
-    print("\nStep 4: Optimizing delivery routes...")
+    # ── Step 5: Optimize routes per car ────────────────────────────────
+    print("\nStep 5: Optimizing delivery routes...")
     output_files = []
 
     for car_name, car_orders in car_groups.items():
         print(f"\n  Optimizing {car_name}...")
 
-        # Build coordinate list: depot (index 0) + order locations
         coords = [depot_coords]
         for _, row in car_orders.iterrows():
             coords.append((row["lat"], row["lon"]))
 
-        # Compute distance and time matrices
         dist_matrix = compute_distance_matrix(coords)
         time_matrix = compute_time_matrix(dist_matrix, AVG_SPEED_KMH)
 
-        # Solve TSP
         route = solve_tsp(time_matrix)
         if route is None:
             print(f"  WARNING: Could not optimize route for {car_name}. Using order as-is.")
             route = list(range(len(coords)))
 
-        # Generate CSV
         filepath = generate_route_csv(
             car_name=car_name,
             car_orders=car_orders,

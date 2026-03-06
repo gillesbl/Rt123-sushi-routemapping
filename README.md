@@ -6,14 +6,14 @@ Sushi delivery route optimizer for Leger des Heils. Reads delivery orders from a
 
 ```bash
 pip install openpyxl geopy ortools pandas
-python optimize_routes.py --input bestellingen.xlsx --start-time 12:00 --dropoff-time 5
+python optimize_routes.py --input "Overzicht bestellingen.xlsx" --start-time 12:00 --dropoff-time 5
 ```
 
 ### Arguments
 
 | Argument | Default | Description |
 |---|---|---|
-| `--input` | (required) | Path to the Excel file with delivery orders |
+| `--input` | `Overzicht bestellingen.xlsx` | Path to the Excel file with delivery orders |
 | `--start-time` | `12:00` | Start driving time in HH:MM format |
 | `--dropoff-time` | `5` | Minutes per delivery stop (parking + door delivery) |
 | `--output-dir` | `./output` | Directory for the 3 output CSV files |
@@ -26,7 +26,7 @@ Three CSV files (semicolon-separated) are generated in the output directory, one
 - `route_Car_2_-_Rotterdam_en_Utrecht.csv` — Rotterdam, Utrecht, and surrounding areas
 - `route_Car_3_-_Amsterdam.csv` — Amsterdam and surrounding areas
 
-Each CSV contains: Startadres, Vertrektijd, Bezorgadres, Aankomsttijd, Aflevermoment, Klant, Bestelling.
+Each CSV contains: Startadres, Vertrektijd, Bezorgadres, Aankomsttijd, Aflevermoment, Klant, Bestelling, Aantal.
 
 ## How the Optimal Route Was Determined
 
@@ -38,8 +38,8 @@ Only orders with the tag **"Leveren"** are included. Orders tagged "Afhalen" (pi
 
 Addresses are converted to GPS coordinates (latitude/longitude) using a two-tier approach:
 
-- **Primary**: Postcode-prefix lookup table — the first 4 digits of a Dutch postcode map to a known coordinate. This is fast and reliable for the Netherlands.
-- **Fallback**: OpenStreetMap Nominatim geocoder for addresses not in the lookup table.
+- **Primary**: OpenStreetMap Nominatim geocoder — parses freeform addresses and geocodes them.
+- **Fallback**: City-center coordinates for known Dutch cities when Nominatim cannot resolve the address.
 
 ### 3. Car Assignment
 
@@ -47,8 +47,8 @@ Orders are assigned to one of three cars based on city:
 
 | Car | Primary Cities | Nearby Cities |
 |---|---|---|
-| Car 1 | Den Haag | Delft, Zoetermeer, Katwijk, Leiden |
-| Car 2 | Rotterdam, Utrecht | Gouda, Dordrecht, Amersfoort |
+| Car 1 | Den Haag | Delft, Zoetermeer, Katwijk, Leiden, Rijswijk, Voorburg, Wassenaar, Wateringen, Nootdorp |
+| Car 2 | Rotterdam, Utrecht | Gouda, Dordrecht, Amersfoort, Badhoevedorp |
 | Car 3 | Amsterdam | Haarlem, Hilversum, Almere |
 
 Orders from cities not in this list are assigned to the car whose region center is geographically closest (geodesic distance).
@@ -86,7 +86,6 @@ All cars depart simultaneously from the depot at the configured start time (defa
 
 | File | Description |
 |---|---|
-| `bestellingen.xlsx` | Input Excel file with delivery orders |
+| `Overzicht bestellingen.xlsx` | Input Excel file with delivery orders |
 | `optimize_routes.py` | Main route optimization script |
-| `create_sample_data.py` | Script that generated the sample Excel data |
 | `output/` | Generated CSV route files |
