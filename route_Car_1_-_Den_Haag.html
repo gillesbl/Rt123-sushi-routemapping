@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Car 1 - Den Haag</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+         background: #f5f5f5; color: #333; }
+  h1 { text-align: center; padding: 14px; font-size: 18px; background: #d32f2f;
+       color: white; }
+  .route-btn-wrap { padding: 16px; text-align: center; }
+  .route-btn { display: inline-block; width: 100%; max-width: 400px; padding: 16px 24px;
+                background: #1a73e8; color: white; font-size: 17px; font-weight: 600;
+                border-radius: 8px; text-decoration: none; }
+  .route-btn:active { background: #1557b0; }
+  .stop-count { text-align: center; color: #666; font-size: 14px; margin-top: 4px; }
+  .controls { padding: 12px 16px; display: flex; gap: 16px; justify-content: center;
+               align-items: center; flex-wrap: wrap; background: #fff;
+               border-bottom: 1px solid #ddd; }
+  .controls label { font-size: 14px; font-weight: 600; }
+  .controls input { font-size: 14px; padding: 4px 8px; border: 1px solid #ccc;
+                     border-radius: 4px; }
+  .controls input[type="number"] { width: 60px; font-size: 16px; }
+  .controls input[type="time"] { font-size: 16px; }
+  .recalc-btn { display: inline-block; padding: 10px 20px; background: #d32f2f;
+                color: white; font-size: 16px; font-weight: 600; border: none;
+                border-radius: 6px; cursor: pointer; -webkit-appearance: none; }
+  .recalc-btn:active { background: #b71c1c; }
+  .table-wrap { overflow-x: auto; padding: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #d32f2f; color: white; position: sticky; top: 0; z-index: 1; }
+  th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #ddd;
+            white-space: nowrap; }
+  tr:nth-child(even) { background: #fafafa; }
+  tr.delivered { background: #c8e6c9 !important; }
+  .td-bezorgd { text-align: center; font-size: 22px; cursor: pointer;
+                -webkit-tap-highlight-color: transparent; user-select: none; min-width: 44px; }
+  a { color: #1a73e8; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div id="loginScreen" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:12px;padding:24px;">
+  <h2 style="color:#d32f2f;">Sushi Bezorgroutes</h2>
+  <input type="password" id="pwInput" placeholder="Wachtwoord" style="font-size:16px;padding:12px 16px;border:1px solid #ccc;border-radius:6px;width:100%;max-width:300px;text-align:center;">
+  <button onclick="checkPw()" style="padding:12px 24px;background:#d32f2f;color:white;font-size:16px;font-weight:600;border:none;border-radius:6px;cursor:pointer;-webkit-appearance:none;">Inloggen</button>
+  <p id="pwError" style="color:#d32f2f;display:none;">Onjuist wachtwoord</p>
+</div>
+<div id="mainContent" style="display:none;">
+<h1>Car 1 - Den Haag</h1>
+<div class="route-btn-wrap">
+  <a class="route-btn" href="https://www.google.com/maps/dir/Leger%20des%20Heils%2C%20Brinckhorstlaan%2C%20Den%20Haag/Regentesselaan%20296%2C%20%20Den%20Haag/Kepplerstraat%20214%2C%20%20Den%20Haag/Fultonstraat%2060%2C%20%20Den%20Haag/Van%20Bylandstraat%20158%2C%20%20Den%20Haag/Populierstraat%2022%2C%20%20Den%20Haag/Cederstraat%2056%2C%20%20Den%20Haag/1e%20braamstraat%2037%2C%202563%20HT%20Den%20Haag/Amandelstraat%2049%2C%20%20Den%20Haag/Purmerendstraat%20255%2C%20%20Den%20Haag/Doris%20Lessinglaan%20130%2C%202553%20ZB%20Den%20Haag/Valkenlaan%2013%2C%20%20Wateringen/Nannie%20van%20Wehlstraat%2095%2C%20%20Den%20Haag/Rhijnauwen%2024%2C%202286%20NH%20Rijswijk/van%20Vredenburchweg%20671%2C%20%20Rijswijk/Kolk%2022%2C%20%20Delft/Hof%20van%20Naeltwijck%2027%2C%20%20nootdorp/Spilsteeg%2023%2C%20%20Leiden/Anemonenweg%2026%2C%20%20Wassenaar/Park%20Leeuwensteijn%2013%2C%20%20Voorburg/Hofwijckstraat%2016%2C%20%20Voorburg/Carel%20Vosmaerstraat%2014%2C%20%20Voorburg/vd%20wateringelaan%20183%2C%20%20Voorburg/Heutszstraat%2082%2C%20%20Den%20Haag/Pahudstraat%20111%2C%20%20Den%20Haag/2de%20Joan%20Maetsuyckersttraat%20251%2C%202593%20ZJ%20Den%20Haag/Johan%20van%20Hoorstraat%2043%2C%20%20Den%20Haag/Van%20Neckstraat%2047%2C%20%20Den%20Haag/Oostduinplein%20199A%2C%20%20Den%20Haag/Stevinstraat%2093%2C%202587%20EC%20Den%20Haag/Havenkade%2024%2C%20%20Den%20Haag/Korendijkstraat%2036%2C%202586%20RP%20Den%20Haag/Frankenslag%20384a%2C%20%20Den%20Haag/Cornelis%20de%20Wittlaan%2094%2C%20%20Den%20Haag/Laan%20van%20Meerdervoort%2055%20C14%2C%20%20Den%20Haag/Huis%20Sten%20Koningsplein%2C%20%20/Houtzagersingel%2049%2C%20%20Den%20Haag" target="_blank">
+    Open route in Google Maps
+  </a>
+  <p class="stop-count">36 bezorgadressen</p>
+</div>
+<div class="controls">
+  <label>Starttijd: <input type="time" id="startTime" value="12:00"></label>
+  <label>Aflevertijd (min): <input type="number" id="dropoffMin" value="5" min="1" max="60" inputmode="numeric"></label>
+  <button class="recalc-btn" onclick="recalculate()">Herbereken</button>
+</div>
+<div class="table-wrap">
+<table>
+<thead><tr>
+  <th>#</th><th>Klant</th><th>Bezorgadres</th><th>Bestelling</th>
+  <th>Vertrek</th><th>Aankomst</th><th>Klaar</th><th>Bezorgd</th>
+</tr></thead>
+<tbody id="routeBody">
+<tr>
+  <td>1</td>
+  <td>Milou vd Broek</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Regentesselaan%20296%2C%20%20Den%20Haag" target="_blank">Regentesselaan 296,  Den Haag</a></td>
+  <td>1x vega, 1x deluxe</td>
+  <td class="td-vertrek">12:00</td>
+  <td class="td-aankomst">12:11</td>
+  <td class="td-klaar">12:16</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>2</td>
+  <td>Alexandra Kievit</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Kepplerstraat%20214%2C%20%20Den%20Haag" target="_blank">Kepplerstraat 214,  Den Haag</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">12:16</td>
+  <td class="td-aankomst">12:18</td>
+  <td class="td-klaar">12:23</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>3</td>
+  <td>Pauline Tans</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Fultonstraat%2060%2C%20%20Den%20Haag" target="_blank">Fultonstraat 60,  Den Haag</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">12:23</td>
+  <td class="td-aankomst">12:24</td>
+  <td class="td-klaar">12:29</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>4</td>
+  <td>Eva Tolmeijer</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Van%20Bylandstraat%20158%2C%20%20Den%20Haag" target="_blank">Van Bylandstraat 158,  Den Haag</a></td>
+  <td>1x classic,1x deluxe</td>
+  <td class="td-vertrek">12:29</td>
+  <td class="td-aankomst">12:35</td>
+  <td class="td-klaar">12:40</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>5</td>
+  <td>Joost van Aggelen</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Populierstraat%2022%2C%20%20Den%20Haag" target="_blank">Populierstraat 22,  Den Haag</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">12:40</td>
+  <td class="td-aankomst">12:47</td>
+  <td class="td-klaar">12:52</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>6</td>
+  <td>Lennart Hoeksema</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Cederstraat%2056%2C%20%20Den%20Haag" target="_blank">Cederstraat 56,  Den Haag</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">12:52</td>
+  <td class="td-aankomst">12:55</td>
+  <td class="td-klaar">13:00</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>7</td>
+  <td>Joep van Kessel</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=1e%20braamstraat%2037%2C%202563%20HT%20Den%20Haag" target="_blank">1e braamstraat 37, 2563 HT Den Haag</a></td>
+  <td>Deluxe + vega</td>
+  <td class="td-vertrek">13:00</td>
+  <td class="td-aankomst">13:05</td>
+  <td class="td-klaar">13:10</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>8</td>
+  <td>Nick van der Elst</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Amandelstraat%2049%2C%20%20Den%20Haag" target="_blank">Amandelstraat 49,  Den Haag</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">13:10</td>
+  <td class="td-aankomst">13:16</td>
+  <td class="td-klaar">13:21</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>9</td>
+  <td>Sander ter Horst</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Purmerendstraat%20255%2C%20%20Den%20Haag" target="_blank">Purmerendstraat 255,  Den Haag</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">13:21</td>
+  <td class="td-aankomst">13:27</td>
+  <td class="td-klaar">13:32</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>10</td>
+  <td>Karen Reiman</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Doris%20Lessinglaan%20130%2C%202553%20ZB%20Den%20Haag" target="_blank">Doris Lessinglaan 130, 2553 ZB Den Haag</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">13:32</td>
+  <td class="td-aankomst">13:46</td>
+  <td class="td-klaar">13:51</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>11</td>
+  <td>Fam. Van der Klei</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Valkenlaan%2013%2C%20%20Wateringen" target="_blank">Valkenlaan 13,  Wateringen</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">13:51</td>
+  <td class="td-aankomst">14:01</td>
+  <td class="td-klaar">14:06</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>12</td>
+  <td>Bas Derksen</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Nannie%20van%20Wehlstraat%2095%2C%20%20Den%20Haag" target="_blank">Nannie van Wehlstraat 95,  Den Haag</a></td>
+  <td>1x vega</td>
+  <td class="td-vertrek">14:06</td>
+  <td class="td-aankomst">14:14</td>
+  <td class="td-klaar">14:19</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>13</td>
+  <td>Carlos Ferreira de Matos</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Rhijnauwen%2024%2C%202286%20NH%20Rijswijk" target="_blank">Rhijnauwen 24, 2286 NH Rijswijk</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">14:19</td>
+  <td class="td-aankomst">14:28</td>
+  <td class="td-klaar">14:33</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>14</td>
+  <td>Michelle van Pelt</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=van%20Vredenburchweg%20671%2C%20%20Rijswijk" target="_blank">van Vredenburchweg 671,  Rijswijk</a></td>
+  <td>Classic</td>
+  <td class="td-vertrek">14:33</td>
+  <td class="td-aankomst">14:38</td>
+  <td class="td-klaar">14:43</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>15</td>
+  <td>Sten</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Kolk%2022%2C%20%20Delft" target="_blank">Kolk 22,  Delft</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">14:43</td>
+  <td class="td-aankomst">14:56</td>
+  <td class="td-klaar">15:01</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>16</td>
+  <td>Sten</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Hof%20van%20Naeltwijck%2027%2C%20%20nootdorp" target="_blank">Hof van Naeltwijck 27,  nootdorp</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">15:01</td>
+  <td class="td-aankomst">15:17</td>
+  <td class="td-klaar">15:22</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>17</td>
+  <td>Nina van der Voort</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Spilsteeg%2023%2C%20%20Leiden" target="_blank">Spilsteeg 23,  Leiden</a></td>
+  <td>2x classic</td>
+  <td class="td-vertrek">15:22</td>
+  <td class="td-aankomst">15:45</td>
+  <td class="td-klaar">15:50</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>18</td>
+  <td>Marie-Fleur Westenburg</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Anemonenweg%2026%2C%20%20Wassenaar" target="_blank">Anemonenweg 26,  Wassenaar</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">15:50</td>
+  <td class="td-aankomst">16:05</td>
+  <td class="td-klaar">16:10</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>19</td>
+  <td>Floris Jansen</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Park%20Leeuwensteijn%2013%2C%20%20Voorburg" target="_blank">Park Leeuwensteijn 13,  Voorburg</a></td>
+  <td>1x classic, 1x deluxe</td>
+  <td class="td-vertrek">16:10</td>
+  <td class="td-aankomst">16:26</td>
+  <td class="td-klaar">16:31</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>20</td>
+  <td>Wouter Roobeek</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Hofwijckstraat%2016%2C%20%20Voorburg" target="_blank">Hofwijckstraat 16,  Voorburg</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">16:31</td>
+  <td class="td-aankomst">16:40</td>
+  <td class="td-klaar">16:45</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>21</td>
+  <td>Norah</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Carel%20Vosmaerstraat%2014%2C%20%20Voorburg" target="_blank">Carel Vosmaerstraat 14,  Voorburg</a></td>
+  <td>1x Deluxe, 1x Vega</td>
+  <td class="td-vertrek">16:45</td>
+  <td class="td-aankomst">16:50</td>
+  <td class="td-klaar">16:55</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>22</td>
+  <td>Reinout Gulje</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=vd%20wateringelaan%20183%2C%20%20Voorburg" target="_blank">vd wateringelaan 183,  Voorburg</a></td>
+  <td>1x Deluxe, 1x Classic</td>
+  <td class="td-vertrek">16:55</td>
+  <td class="td-aankomst">16:59</td>
+  <td class="td-klaar">17:04</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>23</td>
+  <td>Anne Castermans</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Heutszstraat%2082%2C%20%20Den%20Haag" target="_blank">Heutszstraat 82,  Den Haag</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">17:04</td>
+  <td class="td-aankomst">17:08</td>
+  <td class="td-klaar">17:13</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>24</td>
+  <td>Fam. Lampo</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Pahudstraat%20111%2C%20%20Den%20Haag" target="_blank">Pahudstraat 111,  Den Haag</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">17:13</td>
+  <td class="td-aankomst">17:15</td>
+  <td class="td-klaar">17:20</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>25</td>
+  <td>Annegreet Veldhuis-Vlug</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=2de%20Joan%20Maetsuyckersttraat%20251%2C%202593%20ZJ%20Den%20Haag" target="_blank">2de Joan Maetsuyckersttraat 251, 2593 ZJ Den Haag</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">17:20</td>
+  <td class="td-aankomst">17:21</td>
+  <td class="td-klaar">17:26</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>26</td>
+  <td>Max Nijhof</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Johan%20van%20Hoorstraat%2043%2C%20%20Den%20Haag" target="_blank">Johan van Hoorstraat 43,  Den Haag</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">17:26</td>
+  <td class="td-aankomst">17:29</td>
+  <td class="td-klaar">17:34</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>27</td>
+  <td>Pim Smith</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Van%20Neckstraat%2047%2C%20%20Den%20Haag" target="_blank">Van Neckstraat 47,  Den Haag</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">17:34</td>
+  <td class="td-aankomst">17:42</td>
+  <td class="td-klaar">17:47</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>28</td>
+  <td>Pieter Hasselaar</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Oostduinplein%20199A%2C%20%20Den%20Haag" target="_blank">Oostduinplein 199A,  Den Haag</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">17:47</td>
+  <td class="td-aankomst">17:53</td>
+  <td class="td-klaar">17:58</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>29</td>
+  <td>Robert Thomson</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Stevinstraat%2093%2C%202587%20EC%20Den%20Haag" target="_blank">Stevinstraat 93, 2587 EC Den Haag</a></td>
+  <td>Classic</td>
+  <td class="td-vertrek">17:58</td>
+  <td class="td-aankomst">18:04</td>
+  <td class="td-klaar">18:09</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>30</td>
+  <td>Lysanne Vossen</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Havenkade%2024%2C%20%20Den%20Haag" target="_blank">Havenkade 24,  Den Haag</a></td>
+  <td>1x Deluxe, 1x classic</td>
+  <td class="td-vertrek">18:09</td>
+  <td class="td-aankomst">18:11</td>
+  <td class="td-klaar">18:16</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>31</td>
+  <td>Kelly Heij</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Korendijkstraat%2036%2C%202586%20RP%20Den%20Haag" target="_blank">Korendijkstraat 36, 2586 RP Den Haag</a></td>
+  <td>classic</td>
+  <td class="td-vertrek">18:16</td>
+  <td class="td-aankomst">18:19</td>
+  <td class="td-klaar">18:24</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>32</td>
+  <td>Wissal Curfs</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Frankenslag%20384a%2C%20%20Den%20Haag" target="_blank">Frankenslag 384a,  Den Haag</a></td>
+  <td>Classic</td>
+  <td class="td-vertrek">18:24</td>
+  <td class="td-aankomst">18:32</td>
+  <td class="td-klaar">18:37</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>33</td>
+  <td>Bart Bootsma</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Cornelis%20de%20Wittlaan%2094%2C%20%20Den%20Haag" target="_blank">Cornelis de Wittlaan 94,  Den Haag</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">18:37</td>
+  <td class="td-aankomst">18:39</td>
+  <td class="td-klaar">18:44</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>34</td>
+  <td>Nienke Landman</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Laan%20van%20Meerdervoort%2055%20C14%2C%20%20Den%20Haag" target="_blank">Laan van Meerdervoort 55 C14,  Den Haag</a></td>
+  <td>deluxe</td>
+  <td class="td-vertrek">18:44</td>
+  <td class="td-aankomst">18:47</td>
+  <td class="td-klaar">18:52</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>35</td>
+  <td>Sten</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Huis%20Sten%20Koningsplein%2C%20%20" target="_blank">Huis Sten Koningsplein,  </a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">18:52</td>
+  <td class="td-aankomst">19:00</td>
+  <td class="td-klaar">19:05</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>36</td>
+  <td>Arno Pont</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Houtzagersingel%2049%2C%20%20Den%20Haag" target="_blank">Houtzagersingel 49,  Den Haag</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">19:05</td>
+  <td class="td-aankomst">19:06</td>
+  <td class="td-klaar">19:11</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+
+</tbody>
+</table>
+</div>
+<script>
+var driveTimes = [676, 106, 96, 380, 394, 175, 309, 371, 332, 842, 624, 451, 525, 335, 746, 959, 1419, 918, 941, 501, 301, 292, 196, 129, 87, 158, 514, 320, 362, 125, 202, 436, 169, 178, 458, 77];
+function pad(n) { return n < 10 ? '0' + n : '' + n; }
+function fmtTime(totalSec) {
+  var h = Math.floor(totalSec / 3600) % 24;
+  var m = Math.floor((totalSec % 3600) / 60);
+  return pad(h) + ':' + pad(m);
+}
+function recalculate() {
+  var startInput = document.getElementById('startTime').value;
+  var parts = startInput.split(':');
+  var startSec = parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60;
+  var dropoff = parseInt(document.getElementById('dropoffMin').value) * 60;
+  if (isNaN(startSec) || isNaN(dropoff) || dropoff <= 0) return;
+  var trs = document.getElementById('routeBody').rows;
+  var current = startSec;
+  for (var i = 0; i < trs.length; i++) {
+    var vertrek = current;
+    var aankomst = vertrek + driveTimes[i];
+    var klaar = aankomst + dropoff;
+    trs[i].querySelector('.td-vertrek').textContent = fmtTime(vertrek);
+    trs[i].querySelector('.td-aankomst').textContent = fmtTime(aankomst);
+    trs[i].querySelector('.td-klaar').textContent = fmtTime(klaar);
+    current = klaar;
+  }
+}
+// Mobile-friendly: listen to multiple events + poll for native picker changes
+function toggleBezorgd(td) {
+  var tr = td.parentElement;
+  if (tr.classList.contains('delivered')) {
+    tr.classList.remove('delivered');
+    td.textContent = '';
+  } else {
+    tr.classList.add('delivered');
+    td.textContent = '\u2705';
+  }
+}
+var startEl = document.getElementById('startTime');
+var dropEl = document.getElementById('dropoffMin');
+['input','change','blur'].forEach(function(evt) {
+  startEl.addEventListener(evt, recalculate);
+  dropEl.addEventListener(evt, recalculate);
+});
+// Polling fallback for mobile native time pickers that don't fire events
+var lastStart = startEl.value, lastDrop = dropEl.value;
+setInterval(function() {
+  if (startEl.value !== lastStart || dropEl.value !== lastDrop) {
+    lastStart = startEl.value;
+    lastDrop = dropEl.value;
+    recalculate();
+  }
+}, 300);
+</script>
+</div>
+<script>
+function checkPw() {
+  if (document.getElementById('pwInput').value === 'RT123sushi') {
+    sessionStorage.setItem('sushi_auth', '1');
+    showContent();
+  } else {
+    document.getElementById('pwError').style.display = 'block';
+  }
+}
+function showContent() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('mainContent').style.display = '';
+}
+document.getElementById('pwInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') checkPw();
+});
+if (sessionStorage.getItem('sushi_auth') === '1') showContent();
+</script>
+</body>
+</html>

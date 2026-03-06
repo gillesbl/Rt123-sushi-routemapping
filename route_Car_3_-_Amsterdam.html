@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Car 3 - Amsterdam</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+         background: #f5f5f5; color: #333; }
+  h1 { text-align: center; padding: 14px; font-size: 18px; background: #d32f2f;
+       color: white; }
+  .route-btn-wrap { padding: 16px; text-align: center; }
+  .route-btn { display: inline-block; width: 100%; max-width: 400px; padding: 16px 24px;
+                background: #1a73e8; color: white; font-size: 17px; font-weight: 600;
+                border-radius: 8px; text-decoration: none; }
+  .route-btn:active { background: #1557b0; }
+  .stop-count { text-align: center; color: #666; font-size: 14px; margin-top: 4px; }
+  .controls { padding: 12px 16px; display: flex; gap: 16px; justify-content: center;
+               align-items: center; flex-wrap: wrap; background: #fff;
+               border-bottom: 1px solid #ddd; }
+  .controls label { font-size: 14px; font-weight: 600; }
+  .controls input { font-size: 14px; padding: 4px 8px; border: 1px solid #ccc;
+                     border-radius: 4px; }
+  .controls input[type="number"] { width: 60px; font-size: 16px; }
+  .controls input[type="time"] { font-size: 16px; }
+  .recalc-btn { display: inline-block; padding: 10px 20px; background: #d32f2f;
+                color: white; font-size: 16px; font-weight: 600; border: none;
+                border-radius: 6px; cursor: pointer; -webkit-appearance: none; }
+  .recalc-btn:active { background: #b71c1c; }
+  .table-wrap { overflow-x: auto; padding: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #d32f2f; color: white; position: sticky; top: 0; z-index: 1; }
+  th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #ddd;
+            white-space: nowrap; }
+  tr:nth-child(even) { background: #fafafa; }
+  tr.delivered { background: #c8e6c9 !important; }
+  .td-bezorgd { text-align: center; font-size: 22px; cursor: pointer;
+                -webkit-tap-highlight-color: transparent; user-select: none; min-width: 44px; }
+  a { color: #1a73e8; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div id="loginScreen" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:12px;padding:24px;">
+  <h2 style="color:#d32f2f;">Sushi Bezorgroutes</h2>
+  <input type="password" id="pwInput" placeholder="Wachtwoord" style="font-size:16px;padding:12px 16px;border:1px solid #ccc;border-radius:6px;width:100%;max-width:300px;text-align:center;">
+  <button onclick="checkPw()" style="padding:12px 24px;background:#d32f2f;color:white;font-size:16px;font-weight:600;border:none;border-radius:6px;cursor:pointer;-webkit-appearance:none;">Inloggen</button>
+  <p id="pwError" style="color:#d32f2f;display:none;">Onjuist wachtwoord</p>
+</div>
+<div id="mainContent" style="display:none;">
+<h1>Car 3 - Amsterdam</h1>
+<div class="route-btn-wrap">
+  <a class="route-btn" href="https://www.google.com/maps/dir/Leger%20des%20Heils%2C%20Brinckhorstlaan%2C%20Den%20Haag/Winkler%20prinshof%209-2%2C%20%20Amsterdam/Kanaalstraat%20102e%2C%20%20Amsterdam/Tweede%20Hugo%20de%20Grootstraat%2015-1%2C%20%20Amsterdam/Van%20der%20Palmkade%2011%2C%20%20Amsterdam/Laurierstraat%20248-1%2C%20%20Amsterdam/Vijzelgracht%2027A%2C%201017%20HN%20Amsterdam/Nieuwe%20Keizersgracht%20454%2C%20%20Amsterdam/Korte%20Vogelstraat%2011%2C%20%20Amsterdam/Sumatrastraat%2094B%2C%20%20Amsterdam/Vrolikstraat%20290-4%2C%20%20Amsterdam/Tugelaweg%2048D%2C%201092%20VH%20Amsterdam/Amstelvlietstraat%20471%2C%20%20Amsterdam/Zomerdijkstraat%206-1%2C%201079%20XA%20Amsterdam/Peelstraat%2035%2C%20%20Amsterdam/Weenahof%205%2C%20%20Amsterdam/Aalsmeerweg%2083-1%2C%20%20Amsterdam/Schipholweg%2077%2C%20%20Badhoevedorp/Louise%20de%20Colignylaan%2040%2C%20%20Santpoort%20Zuid" target="_blank">
+    Open route in Google Maps
+  </a>
+  <p class="stop-count">18 bezorgadressen</p>
+</div>
+<div class="controls">
+  <label>Starttijd: <input type="time" id="startTime" value="12:00"></label>
+  <label>Aflevertijd (min): <input type="number" id="dropoffMin" value="5" min="1" max="60" inputmode="numeric"></label>
+  <button class="recalc-btn" onclick="recalculate()">Herbereken</button>
+</div>
+<div class="table-wrap">
+<table>
+<thead><tr>
+  <th>#</th><th>Klant</th><th>Bezorgadres</th><th>Bestelling</th>
+  <th>Vertrek</th><th>Aankomst</th><th>Klaar</th><th>Bezorgd</th>
+</tr></thead>
+<tbody id="routeBody">
+<tr>
+  <td>1</td>
+  <td>Floor Oosterwechel</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Winkler%20prinshof%209-2%2C%20%20Amsterdam" target="_blank">Winkler prinshof 9-2,  Amsterdam</a></td>
+  <td>Classic</td>
+  <td class="td-vertrek">12:00</td>
+  <td class="td-aankomst">12:48</td>
+  <td class="td-klaar">12:53</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>2</td>
+  <td>Maud Oostenbroek</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Kanaalstraat%20102e%2C%20%20Amsterdam" target="_blank">Kanaalstraat 102e,  Amsterdam</a></td>
+  <td>Classic</td>
+  <td class="td-vertrek">12:53</td>
+  <td class="td-aankomst">13:02</td>
+  <td class="td-klaar">13:07</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>3</td>
+  <td>Folkert de Jong</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Tweede%20Hugo%20de%20Grootstraat%2015-1%2C%20%20Amsterdam" target="_blank">Tweede Hugo de Grootstraat 15-1,  Amsterdam</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">13:07</td>
+  <td class="td-aankomst">13:15</td>
+  <td class="td-klaar">13:20</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>4</td>
+  <td>Dam. Dijckmeester</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Van%20der%20Palmkade%2011%2C%20%20Amsterdam" target="_blank">Van der Palmkade 11,  Amsterdam</a></td>
+  <td>2x Deluxe</td>
+  <td class="td-vertrek">13:20</td>
+  <td class="td-aankomst">13:25</td>
+  <td class="td-klaar">13:30</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>5</td>
+  <td>Fam. Van Listenburg</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Laurierstraat%20248-1%2C%20%20Amsterdam" target="_blank">Laurierstraat 248-1,  Amsterdam</a></td>
+  <td>Classic</td>
+  <td class="td-vertrek">13:30</td>
+  <td class="td-aankomst">13:44</td>
+  <td class="td-klaar">13:49</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>6</td>
+  <td>Alex Dekker</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Vijzelgracht%2027A%2C%201017%20HN%20Amsterdam" target="_blank">Vijzelgracht 27A, 1017 HN Amsterdam</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">13:49</td>
+  <td class="td-aankomst">13:59</td>
+  <td class="td-klaar">14:04</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>7</td>
+  <td>Julia van Buuren</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Nieuwe%20Keizersgracht%20454%2C%20%20Amsterdam" target="_blank">Nieuwe Keizersgracht 454,  Amsterdam</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">14:04</td>
+  <td class="td-aankomst">14:12</td>
+  <td class="td-klaar">14:17</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>8</td>
+  <td>Pieter Herings</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Korte%20Vogelstraat%2011%2C%20%20Amsterdam" target="_blank">Korte Vogelstraat 11,  Amsterdam</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">14:17</td>
+  <td class="td-aankomst">14:25</td>
+  <td class="td-klaar">14:30</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>9</td>
+  <td>Emmy Hertogh</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Sumatrastraat%2094B%2C%20%20Amsterdam" target="_blank">Sumatrastraat 94B,  Amsterdam</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">14:30</td>
+  <td class="td-aankomst">14:44</td>
+  <td class="td-klaar">14:49</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>10</td>
+  <td>Koen Enneking</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Vrolikstraat%20290-4%2C%20%20Amsterdam" target="_blank">Vrolikstraat 290-4,  Amsterdam</a></td>
+  <td>Vega</td>
+  <td class="td-vertrek">14:49</td>
+  <td class="td-aankomst">14:52</td>
+  <td class="td-klaar">14:57</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>11</td>
+  <td>Teus Louwerens</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Tugelaweg%2048D%2C%201092%20VH%20Amsterdam" target="_blank">Tugelaweg 48D, 1092 VH Amsterdam</a></td>
+  <td>2x Deluxe</td>
+  <td class="td-vertrek">14:57</td>
+  <td class="td-aankomst">15:02</td>
+  <td class="td-klaar">15:07</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>12</td>
+  <td>Otis Koningswijk</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Amstelvlietstraat%20471%2C%20%20Amsterdam" target="_blank">Amstelvlietstraat 471,  Amsterdam</a></td>
+  <td>1x deluxe</td>
+  <td class="td-vertrek">15:07</td>
+  <td class="td-aankomst">15:18</td>
+  <td class="td-klaar">15:23</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>13</td>
+  <td>Thomas Colenbrander</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Zomerdijkstraat%206-1%2C%201079%20XA%20Amsterdam" target="_blank">Zomerdijkstraat 6-1, 1079 XA Amsterdam</a></td>
+  <td>1x deluxe, 1x vega</td>
+  <td class="td-vertrek">15:23</td>
+  <td class="td-aankomst">15:29</td>
+  <td class="td-klaar">15:34</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>14</td>
+  <td>Friso Resink</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Peelstraat%2035%2C%20%20Amsterdam" target="_blank">Peelstraat 35,  Amsterdam</a></td>
+  <td>vega</td>
+  <td class="td-vertrek">15:34</td>
+  <td class="td-aankomst">15:37</td>
+  <td class="td-klaar">15:42</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>15</td>
+  <td>Daan Eleveld</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Weenahof%205%2C%20%20Amsterdam" target="_blank">Weenahof 5,  Amsterdam</a></td>
+  <td>Vega, classic</td>
+  <td class="td-vertrek">15:42</td>
+  <td class="td-aankomst">15:50</td>
+  <td class="td-klaar">15:55</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>16</td>
+  <td>Fabienne van den Akker</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Aalsmeerweg%2083-1%2C%20%20Amsterdam" target="_blank">Aalsmeerweg 83-1,  Amsterdam</a></td>
+  <td>Deluxe</td>
+  <td class="td-vertrek">15:55</td>
+  <td class="td-aankomst">16:04</td>
+  <td class="td-klaar">16:09</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>17</td>
+  <td>Fam. Ferwerda</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Schipholweg%2077%2C%20%20Badhoevedorp" target="_blank">Schipholweg 77,  Badhoevedorp</a></td>
+  <td>2x Deluxe</td>
+  <td class="td-vertrek">16:09</td>
+  <td class="td-aankomst">16:20</td>
+  <td class="td-klaar">16:25</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+<tr>
+  <td>18</td>
+  <td>Fam. Dijckmeester</td>
+  <td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Louise%20de%20Colignylaan%2040%2C%20%20Santpoort%20Zuid" target="_blank">Louise de Colignylaan 40,  Santpoort Zuid</a></td>
+  <td>2x Vega</td>
+  <td class="td-vertrek">16:25</td>
+  <td class="td-aankomst">16:48</td>
+  <td class="td-klaar">16:53</td>
+  <td class="td-bezorgd" onclick="toggleBezorgd(this)"></td>
+</tr>
+
+</tbody>
+</table>
+</div>
+<script>
+var driveTimes = [2921, 554, 473, 271, 826, 648, 456, 499, 814, 217, 272, 656, 376, 170, 491, 554, 634, 1356];
+function pad(n) { return n < 10 ? '0' + n : '' + n; }
+function fmtTime(totalSec) {
+  var h = Math.floor(totalSec / 3600) % 24;
+  var m = Math.floor((totalSec % 3600) / 60);
+  return pad(h) + ':' + pad(m);
+}
+function recalculate() {
+  var startInput = document.getElementById('startTime').value;
+  var parts = startInput.split(':');
+  var startSec = parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60;
+  var dropoff = parseInt(document.getElementById('dropoffMin').value) * 60;
+  if (isNaN(startSec) || isNaN(dropoff) || dropoff <= 0) return;
+  var trs = document.getElementById('routeBody').rows;
+  var current = startSec;
+  for (var i = 0; i < trs.length; i++) {
+    var vertrek = current;
+    var aankomst = vertrek + driveTimes[i];
+    var klaar = aankomst + dropoff;
+    trs[i].querySelector('.td-vertrek').textContent = fmtTime(vertrek);
+    trs[i].querySelector('.td-aankomst').textContent = fmtTime(aankomst);
+    trs[i].querySelector('.td-klaar').textContent = fmtTime(klaar);
+    current = klaar;
+  }
+}
+function toggleBezorgd(td) {
+  var tr = td.parentElement;
+  if (tr.classList.contains('delivered')) {
+    tr.classList.remove('delivered');
+    td.textContent = '';
+  } else {
+    tr.classList.add('delivered');
+    td.textContent = '\u2705';
+  }
+}
+var startEl = document.getElementById('startTime');
+var dropEl = document.getElementById('dropoffMin');
+['input','change','blur'].forEach(function(evt) {
+  startEl.addEventListener(evt, recalculate);
+  dropEl.addEventListener(evt, recalculate);
+});
+var lastStart = startEl.value, lastDrop = dropEl.value;
+setInterval(function() {
+  if (startEl.value !== lastStart || dropEl.value !== lastDrop) {
+    lastStart = startEl.value;
+    lastDrop = dropEl.value;
+    recalculate();
+  }
+}, 300);
+</script>
+</div>
+<script>
+function checkPw() {
+  if (document.getElementById('pwInput').value === 'RT123sushi') {
+    sessionStorage.setItem('sushi_auth', '1');
+    showContent();
+  } else {
+    document.getElementById('pwError').style.display = 'block';
+  }
+}
+function showContent() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('mainContent').style.display = '';
+}
+document.getElementById('pwInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') checkPw();
+});
+if (sessionStorage.getItem('sushi_auth') === '1') showContent();
+</script>
+</body>
+</html>
