@@ -46,6 +46,10 @@
   .card-address { font-size: 14px; color: #555; margin-bottom: 4px; }
   .card-address a { color: #1a73e8; text-decoration: none; }
   .card-bestelling { font-size: 13px; color: #777; margin-bottom: 6px; }
+  .card-tafelaar { font-size: 12px; color: #999; margin-bottom: 2px; }
+  .card-phone { font-size: 13px; color: #1a73e8; margin-bottom: 2px; }
+  .card-phone a { color: #1a73e8; text-decoration: none; }
+  .card-notes { font-size: 12px; color: #e65100; font-style: italic; margin-bottom: 6px; }
   .card-times { display: flex; gap: 4px; align-items: center; font-size: 13px; }
   .card-times .time-label { color: #999; font-size: 11px; }
   .card-times .time-val { font-weight: 600; color: #333; }
@@ -64,7 +68,7 @@
 <div id="mainContent" style="display:none;">
 <h1>Car 2 - Rotterdam &amp; Utrecht</h1>
 <div class="route-btn-wrap">
-  <a class="route-btn" href="https://www.google.com/maps/dir/Leger%20des%20Heils%2C%20Brinckhorstlaan%2C%20Den%20Haag/Bruijnstraat%2038%2C%20Rotterdam/Mullerhoofd%2017%2C%20Rotterda/Maaskade%20138a03%20Rotterdam/Scheldestraat%2078%2C%20Utrecht/Begijnehof%2028%2C%20Utrecht/Ondiep%20145-BIS%2C%20Utrecht/Mexicodreef%20221%2C%20Utrecht/Spilsteeg%2023%2C%20Leiden/Anemonenweg%2026%2C%20Wassenaar" target="_blank">
+  <a class="route-btn" href="https://www.google.com/maps/dir/Leger%20des%20Heils%2C%20Brinckhorstlaan%2C%20Den%20Haag/Bruijnstraat%2038%2C%20Rotterdam/Mullerhoofd%2017%2C%20Rotterdam/Maaskade%20138a03%20Rotterdam/Scheldestraat%2078%2C%20Utrecht/Begijnehof%2028%2C%20Utrecht/Ondiep%20145-BIS%2C%20Utrecht/Mexicodreef%20221%2C%20Utrecht/Spilsteeg%2023%2C%20Leiden/Anemonenweg%2026%2C%20Wassenaar" target="_blank">
     Open route in Google Maps
   </a>
   <p class="stop-count">9 bezorgadressen</p>
@@ -79,63 +83,90 @@
 <div class="card">
   <div class="card-header"><span class="card-num">1</span><span class="card-klant">Wout Frijters</span><span class="card-check"></span></div>
   <div class="card-address"><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Bruijnstraat%2038%2C%20Rotterdam" target="_blank">Bruijnstraat 38, Rotterdam</a></div>
-  <div class="card-bestelling">1x Classic</div>
+  <div class="card-bestelling">1C</div>
+  <div class="card-tafelaar">Tafelaar: Reinier</div>
+  
+  
   <div class="card-times"><div class="time-block"><span class="time-label">Vertrek</span><span class="time-val td-vertrek">13:30</span></div><span class="time-arrow">&rarr;</span><div class="time-block"><span class="time-label">Aankomst</span><span class="time-val td-aankomst">13:53</span></div><span class="time-arrow">&rarr;</span><div class="time-block"><span class="time-label">Klaar</span><span class="time-val td-klaar">13:58</span></div></div>
 </div>
 
 <div class="card">
   <div class="card-header"><span class="card-num">2</span><span class="card-klant">Stijn van Driessen</span><span class="card-check"></span></div>
-  <div class="card-address"><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Mullerhoofd%2017%2C%20Rotterda" target="_blank">Mullerhoofd 17, Rotterda</a></div>
-  <div class="card-bestelling">1x Deluxe</div>
+  <div class="card-address"><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Mullerhoofd%2017%2C%20Rotterdam" target="_blank">Mullerhoofd 17, Rotterdam</a></div>
+  <div class="card-bestelling">1D</div>
+  <div class="card-tafelaar">Tafelaar: Jaap</div>
+  
+  
   <div class="card-times"><div class="time-block"><span class="time-label">Vertrek</span><span class="time-val td-vertrek">13:58</span></div><span class="time-arrow">&rarr;</span><div class="time-block"><span class="time-label">Aankomst</span><span class="time-val td-aankomst">14:08</span></div><span class="time-arrow">&rarr;</span><div class="time-block"><span class="time-label">Klaar</span><span class="time-val td-klaar">14:13</span></div></div>
 </div>
 
 <div class="card">
   <div class="card-header"><span class="card-num">3</span><span class="card-klant">Iris Louwerens</span><span class="card-check"></span></div>
   <div class="card-address"><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Maaskade%20138a03%20Rotterdam" target="_blank">Maaskade 138a03 Rotterdam</a></div>
-  <div class="card-bestelling">1x Deluxe, 1x Classic, 1x Vega, 1x Sake</div>
+  <div class="card-bestelling">1D 1C 1V 1S</div>
+  <div class="card-tafelaar">Tafelaar: Gilles</div>
+  
+  
   <div class="card-times"><div class="time-block"><span class="time-label">Vertrek</span><span class="time-val td-vertrek">14:13</span></div><span class="time-arrow">&rarr;</span><div class="time-block"><span class="time-label">Aankomst</span><span class="time-val td-aankomst">14:27</span></div><span class="time-arrow">&rarr;</span><div class="time-block"><span class="time-label">Klaar</span><span class="time-val td-klaar">14:32</span></div></div>
 </div>
 
 <div class="card">
   <div class="card-header"><span class="card-num">4</span><span class="card-klant">Rutger van Eeuwijk</span><span class="card-check"></span></div>
   <div class="card-address"><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Scheldestraat%2078%2C%20Utrecht" target="_blank">Scheldestraat 78, Utrecht</a></div>
-  <div class="card-bestelling">1x Deluxe</div>
+  <div class="card-bestelling">1D</div>
+  <div class="card-tafelaar">Tafelaar: Jaap</div>
+  
+  
   <div class="card-times"><div class="time-block"><span class="time-label">Vertrek</span><span class="time-val td-vertrek">14:32</span></div><span class="time-arrow">&rarr;</span><div class="time-block"><span class="time-label">Aankomst</span><span class="time-val td-aankomst">15:23</span></div><span class="time-arrow">&rarr;</span><div class="time-block"><span class="time-label">Klaar</span><span class="time-val td-klaar">15:28</span></div></div>
 </div>
 
 <div class="card">
   <div class="card-header"><span class="card-num">5</span><span class="card-klant">Maaike Tol</span><span class="card-check"></span></div>
   <div class="card-address"><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Begijnehof%2028%2C%20Utrecht" target="_blank">Begijnehof 28, Utrecht</a></div>
-  <div class="card-bestelling">1x Classic</div>
+  <div class="card-bestelling">1C</div>
+  <div class="card-tafelaar">Tafelaar: Maarten</div>
+  
+  
   <div class="card-times"><div class="time-block"><span class="time-label">Vertrek</span><span class="time-val td-vertrek">15:28</span></div><span class="time-arrow">&rarr;</span><div class="time-block"><span class="time-label">Aankomst</span><span class="time-val td-aankomst">15:44</span></div><span class="time-arrow">&rarr;</span><div class="time-block"><span class="time-label">Klaar</span><span class="time-val td-klaar">15:49</span></div></div>
 </div>
 
 <div class="card">
   <div class="card-header"><span class="card-num">6</span><span class="card-klant">Bram Rijsbosch</span><span class="card-check"></span></div>
   <div class="card-address"><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Ondiep%20145-BIS%2C%20Utrecht" target="_blank">Ondiep 145-BIS, Utrecht</a></div>
-  <div class="card-bestelling">1x Vega</div>
+  <div class="card-bestelling">1V</div>
+  <div class="card-tafelaar">Tafelaar: Seger</div>
+  
+  
   <div class="card-times"><div class="time-block"><span class="time-label">Vertrek</span><span class="time-val td-vertrek">15:49</span></div><span class="time-arrow">&rarr;</span><div class="time-block"><span class="time-label">Aankomst</span><span class="time-val td-aankomst">15:57</span></div><span class="time-arrow">&rarr;</span><div class="time-block"><span class="time-label">Klaar</span><span class="time-val td-klaar">16:02</span></div></div>
 </div>
 
 <div class="card">
-  <div class="card-header"><span class="card-num">7</span><span class="card-klant">Fam. Dijckmeester</span><span class="card-check"></span></div>
+  <div class="card-header"><span class="card-num">7</span><span class="card-klant">Fam. Dijckmeester (Utrecht)</span><span class="card-check"></span></div>
   <div class="card-address"><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Mexicodreef%20221%2C%20Utrecht" target="_blank">Mexicodreef 221, Utrecht</a></div>
-  <div class="card-bestelling">1x Deluxe</div>
+  <div class="card-bestelling">1D</div>
+  <div class="card-tafelaar">Tafelaar: Jors</div>
+  
+  
   <div class="card-times"><div class="time-block"><span class="time-label">Vertrek</span><span class="time-val td-vertrek">16:02</span></div><span class="time-arrow">&rarr;</span><div class="time-block"><span class="time-label">Aankomst</span><span class="time-val td-aankomst">16:11</span></div><span class="time-arrow">&rarr;</span><div class="time-block"><span class="time-label">Klaar</span><span class="time-val td-klaar">16:16</span></div></div>
 </div>
 
 <div class="card">
   <div class="card-header"><span class="card-num">8</span><span class="card-klant">Nina van der Voort</span><span class="card-check"></span></div>
   <div class="card-address"><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Spilsteeg%2023%2C%20Leiden" target="_blank">Spilsteeg 23, Leiden</a></div>
-  <div class="card-bestelling">2x Classic</div>
+  <div class="card-bestelling">2C</div>
+  <div class="card-tafelaar">Tafelaar: Jaap</div>
+  
+  
   <div class="card-times"><div class="time-block"><span class="time-label">Vertrek</span><span class="time-val td-vertrek">16:16</span></div><span class="time-arrow">&rarr;</span><div class="time-block"><span class="time-label">Aankomst</span><span class="time-val td-aankomst">17:05</span></div><span class="time-arrow">&rarr;</span><div class="time-block"><span class="time-label">Klaar</span><span class="time-val td-klaar">17:10</span></div></div>
 </div>
 
 <div class="card">
   <div class="card-header"><span class="card-num">9</span><span class="card-klant">Marie-Fleur Westenburg</span><span class="card-check"></span></div>
   <div class="card-address"><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Anemonenweg%2026%2C%20Wassenaar" target="_blank">Anemonenweg 26, Wassenaar</a></div>
-  <div class="card-bestelling">1x Deluxe</div>
+  <div class="card-bestelling">1D</div>
+  <div class="card-tafelaar">Tafelaar: Jaap</div>
+  
+  
   <div class="card-times"><div class="time-block"><span class="time-label">Vertrek</span><span class="time-val td-vertrek">17:10</span></div><span class="time-arrow">&rarr;</span><div class="time-block"><span class="time-label">Aankomst</span><span class="time-val td-aankomst">17:25</span></div><span class="time-arrow">&rarr;</span><div class="time-block"><span class="time-label">Klaar</span><span class="time-val td-klaar">17:30</span></div></div>
 </div>
 
